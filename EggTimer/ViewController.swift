@@ -15,16 +15,25 @@ class ViewController: UIViewController {
 //    let mediumTime = 7
 //    let hardTime = 12
     
-    let eggTimes = ["Soft": 5, "Medium": 7, "Hard": 12]
+    let eggTimes = ["Soft": 300, "Medium": 420, "Hard": 720]
+    
 
     @IBAction func EggTypeSelected(_ sender: UIButton) {
         
         guard let hardness = sender.currentTitle else { return }
         
-        guard let result = eggTimes[hardness] else { return }
+        guard var secondsRemaining = eggTimes[hardness] else { return }
         
         
-        print (result)
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (Timer) in
+                if secondsRemaining > 0 {
+                    print ("\(secondsRemaining) seconds")
+                    secondsRemaining -= 1
+                } else {
+                    Timer.invalidate()
+                }
+            }
+                    
         
 //  swith-case method
 //        switch hardness {
