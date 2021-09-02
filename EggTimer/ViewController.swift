@@ -7,62 +7,52 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
     
-//   3 constans method
-//    let softTime = 5
-//    let mediumTime = 7
-//    let hardTime = 12
     
-
-
     
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var progressBar: UIProgressView!
+    @IBOutlet weak var progressLabel: UILabel!
     
-    let eggTimes = ["Soft": 3, "Medium": 4, "Hard": 7]
-    
+    let eggTimes = ["Soft": 300, "Medium": 420, "Hard": 720]
     var timer = Timer()
-
-    @IBAction func eggTypeSelected(_ sender: UIButton) {
-        titleLabel.text = "How do you like your eggs?"
-        
-        guard let hardness = sender.currentTitle else { return }
-        
-        guard var secondsRemaining = eggTimes[hardness] else { return }
-        
-        timer.invalidate()
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [self] (Timer) in
-                if secondsRemaining > 0 {
-                    print ("\(secondsRemaining) seconds")
-                    secondsRemaining -= 1
-                } else {
-                    Timer.invalidate()
-                    titleLabel.text = "Done"
-                }
-            }
-                    
-        
-//  swith-case method
-//        switch hardness {
-//
-//        case "Soft": print ("\(softTime) minutes")
-//        case "Medium": print ("\(mediumTime) minutes")
-//        case "Hard": print ("\(hardTime) minutes")
-//        default: break
-//        }
-        
-// if-else method
-//        if hardness == "Soft" {
-//            print ("\(softTime) minutes")
-//        } else if hardness == "Medium" {
-//            print ("\(mediumTime) minutes")
-//        } else {
-//            print ("\(hardTime) minutes")
-//        }
+    var totalTime: Float = 0
+    var secondsPassed: Float = 0
+    var player = AVAudioPlayer()
+    
+    
+    func playSound() {
+        let url = Bundle.main.url(forResource: "alarm_sound", withExtension: "mp3")
+        player = try! AVAudioPlayer(contentsOf: url!)
+        player.play()
         
     }
     
-    
+    @IBAction func eggTypeSelected(_ sender: UIButton) {
+        
+        guard let hardness = sender.currentTitle else { return }
+        
+        totalTime = Float (eggTimes[hardness] ?? 0)
+        
+        timer.invalidate()
+        progressBar.progress = 0.0
+        secondsPassed = 0
+        titleLabel.text = hardness
+        progressLabel.text = "progress"
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [self] (Timer) in
+            if secondsPassed < totalTime {
+                secondsPassed += 1
+                progressBar.progress = secondsPassed/totalTime
+                progressLabel.text = "\(Int(secondsPassed/totalTime * 100))%"
+            } else {
+                Timer.invalidate()
+                titleLabel.text = "Done!"
+                playSound()
+            }
+        }
+    }
 }
