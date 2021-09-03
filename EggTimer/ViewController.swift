@@ -21,14 +21,18 @@ class ViewController: UIViewController {
     var timer = Timer()
     var totalTime: Float = 0
     var secondsPassed: Float = 0
-    var player = AVAudioPlayer()
+    var player: AVAudioPlayer?
     
     
     func playSound() {
-        let url = Bundle.main.url(forResource: "alarm_sound", withExtension: "mp3")
-        player = try! AVAudioPlayer(contentsOf: url!)
-        player.play()
-        
+        guard let url = Bundle.main.url(forResource: "alarm_sound", withExtension: "mp3")  else { return }
+        do {
+            player = try AVAudioPlayer(contentsOf: url)
+            guard let player = player else { return }
+            player.play()
+        } catch {
+            print ("Error")
+        }
     }
     
     @IBAction func eggTypeSelected(_ sender: UIButton) {
@@ -47,7 +51,7 @@ class ViewController: UIViewController {
             if secondsPassed < totalTime {
                 secondsPassed += 1
                 progressBar.progress = secondsPassed/totalTime
-                progressLabel.text = "\(Int(secondsPassed/totalTime * 100))%"
+                progressLabel.text = "\(Int(progressBar.progress * 100))%"
             } else {
                 Timer.invalidate()
                 titleLabel.text = "Done!"
@@ -55,4 +59,14 @@ class ViewController: UIViewController {
             }
         }
     }
+    
+    @IBAction func stopButton(_ sender: UIButton) {
+        timer.invalidate()
+        titleLabel.text = "Stop!"
+        playSound()
+    }
+    
+    
+    
+    
 }
